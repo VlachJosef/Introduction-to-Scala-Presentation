@@ -1,0 +1,772 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>Introduction to Scala</title>
+
+		<meta name="description" content="Introduction to Scala">
+		<meta name="author" content="Josef Vlach">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<link rel="stylesheet" href="css/reveal.min.css">
+		<link rel="stylesheet" href="css/theme/simple.css" id="theme">
+		<link rel="stylesheet" href="css/custom.css">
+
+		<!-- For syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/github.css">
+		
+		<!-- If the query includes 'print-pdf', use the PDF print sheet -->
+		<script>
+			document.write( '<link rel="stylesheet" href="css/print/' + ( window.location.search.match( /print-pdf/gi ) ? 'pdf' : 'paper' ) + '.css" type="text/css" media="print">' );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+				<section>
+					<h2>Introduction to Scala</h2>
+					<h2>Functional Programming in Scala</h2>
+					<p>
+						<small>Created by <a href="https://www.linkedin.com/pub/josef-vlach/8b/49b/563">Josef Vlach</a> / <a href="mailto:vlach.josef@gmail.com?subject=Introduction to Scala Presentation">vlach.josef@gmail.com</a></small>
+					</p>
+				</section>
+				<section>
+					<h2>Agenda</h2>
+					<ul>
+						<li>Scala Basics</li>
+						<li style="list-style-type: none">
+							<ul>
+								<li>Basic syntax</li>
+								<li>Avoiding NullPointerException</li>
+								<li>Pattern matching</li>
+							</ul>
+						</li>
+						<li>Live Coding</li>
+						<li>Functional Programming</li>
+					</ul>
+				</section>
+				<section>
+					<h2>What is Scala?</h2>
+					<ul>
+						<li class="fragment">Created by prof. Martin Odersky - EPFL</li>
+						<li class="fragment">Appeared around 2003</li>
+						<li class="fragment">FP + OO</li>
+						<li class="fragment">Compiling to Byte code and running in JVM</li>
+						<li class="fragment">Statically typed</li>
+						<li class="fragment"><span class="red">but</span> with Type Inference</li>
+						<li class="fragment">Very good Java interop</li>
+						<li class="fragment">Open Source</li>
+					</ul>
+				</section>
+
+				<section>
+					<section>
+						<h1>Basics</h1>
+					</section>
+					<section>
+						<h2>Hello World</h2>
+						<pre><code data-trim contenteditable>
+  object MyApp {
+    def main(args: Array[String]): Unit = {
+      println("Hello World!")
+    }
+  }
+  
+  <span class="fragment">object MyApp extends App {
+    println("Hello World!")
+  }</span>
+						</code></pre>
+					</section>
+					<section>
+						<h2>Define some variables</h2>
+						<ul>
+							<li>Scala has two kinds of variables, <span class="monospace yellow">val</span>s and <span class="monospace yellow">var</span>s</li>
+						</ul>
+						<pre class="fragment"><code data-trim contenteditable>
+  val msg = "Hello, world!"
+
+  <span class="fragment">msg = "Goodbye cruel world!" // error: reassignment to val</span>
+
+  <span class="fragment">var greeting = "Hello, world!"</span>
+
+  <span class="fragment">greeting = "Leave me alone, world!" // OK</span>
+  
+  <span class="fragment">val msg2: java.lang.String = "Hello again, world!"</span>
+
+  <span class="fragment">val msg3: String = "Hello again, world!"</span>
+						</code></pre>
+					</section>
+					<section>
+						<h2>Simple Method</h2>
+						<pre><code data-trim contenteditable>
+  def getFullName(firstName: String, lastName: String): String = {
+    firstName + " " + lastName
+  }
+						</code></pre>
+					</section>
+					<section>
+						<h2>Real World Method</h2>
+						<pre><code data-trim contenteditable>
+  def getFullName(firstName: String, lastName: String): String = {
+    val result: StringBuilder = new StringBuilder
+
+    if(!firstName.trim.isEmpty) {
+        result append firstName
+    }
+
+    if(!lastName.trim.isEmpty) {
+        if(!result.isEmpty) {
+            result append " "
+        }
+
+        result append lastName
+    }
+
+    result.toString
+  }
+						</code></pre>
+					</section>
+					<section>
+						<h2>Infix/Dot Notation</h2>
+						<pre><code data-trim contenteditable>
+  1 + 2
+
+  <span class="fragment">(1).+(2)</span>
+
+
+  <span class="fragment">result.append(a).append(b).append(c)
+  result append a append b append c</span>
+						</code></pre>
+					</section>
+					<section>
+						<h2>Real World Method</h2>
+						<pre><code data-trim contenteditable>
+  def getFullName(firstName: String, lastName: String): String = {
+    val result: StringBuilder = new StringBuilder
+
+    if(!firstName.trim.isEmpty) {
+        result append firstName
+    }
+
+    if(!lastName.trim.isEmpty) {
+        if(!result.isEmpty) {
+            result append " "
+        }
+
+        result append lastName
+    }
+
+    result.toString
+  }
+						</code></pre>
+					</section>
+
+					<section>
+						<h2>Nice</h2>
+						<pre><code data-trim contenteditable>
+  def getFullName(firstName: String, lastName: String) = 
+    List(firstName, lastName) filterNot (_.trim.isEmpty) mkString " "
+						</code></pre>
+					</section>
+					<section>
+						<h2>Everything is an Expression</h2>
+						<pre><code data-trim contenteditable>
+  val color = if(user.isBlocked) "red" else "green"
+  
+  val number = try "123".toInt catch {
+    case e: NumberFormatException => 0
+  }					
+						</code></pre>
+					</section>
+					<section>
+						<h2>Default Arguments</h2>
+						<pre><code data-trim contenteditable>
+  def getUser(
+    firstName: String = "John",
+    lastName: String = "Doe",
+    age: Int = -1) = {
+    // ...
+  }
+						</code></pre>
+					</section>
+					<section>
+						<h2>Named Arguments</h2>
+						<ul style="width: 755px;"><li>How many times you saw this?
+<pre><code data-trim contenteditable>
+  createUser(user, true, false, false, true, false, false)
+
+</code></pre></li>
+<li class="fragment">Isn't this better?
+<pre><code data-trim contenteditable>
+  createUser(
+    user = user,
+    encryptPassword = true,
+    admin = false,
+    ldapAuth = false,
+    suspicious = true,
+    blocked = false,
+    visible = false)
+
+</code></pre></li></ul>
+					</section>
+					<section>
+						<h2>Class User - Java 1/4</h2>
+						<pre><code data-trim contenteditable>
+  public class User {
+    private String firstName;
+    private String lastName;
+    private int age;
+  
+    public User(String firstName, String lastName, int age) {
+      this.firstName = firstName;
+      this.lastName = lastName;
+      this.age = age;
+    }
+  
+    public User(String firstName, String lastName) {
+      this.firstName = firstName;
+      this.lastName = lastName;
+    }
+  
+    public User() {}
+						</code></pre>
+					</section>
+					<section>
+						<h2>Class User - Java 2/4</h2>
+						<pre><code data-trim contenteditable>
+  public String getFirstName() { return firstName; }
+  public void setFirstName(String firstName) { this.firstName = firstName;}
+ 
+  public String getLastName() { return lastName; }
+  public void setLastName(String lastName) { this.lastName = lastName; }
+ 
+  public int getAge() { return age; }
+  public void setAge(int age) { this.age = age; }
+
+</code></pre>
+					</section>
+					<section>
+						<h2>Class User - Java 3/4</h2>
+						<pre><code data-trim contenteditable>
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + age;
+    result = prime * result;
+        + ((firstName == null) ? 0 : firstName.hashCode());
+    result = prime * result
+        + ((lastName == null) ? 0 : lastName.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    User other = (User) o;    
+    return age == other.age && firstName.equals(other.firstName) &&
+        lastName.equals(other.lastName);
+  }</code></pre>
+					</section>
+					<section>
+						<h2>Class User - Java 4/4</h2>
+						<pre><code data-trim contenteditable>
+    @Override
+    public String toString() {
+      return "User(" + 
+          firstName + ", " + 
+          lastName + ", " + 
+          age + ")";
+    }
+  }
+
+</code></pre>
+					</section>
+					<section>
+						<h2>Class User - Scala</h2>
+						<pre><code data-trim contenteditable>
+case class User(var firstName: String, var lastName: String, var age: Int)
+
+</code></pre>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h1 style="text-transform: none;">The Option type</h1>
+					</section>
+					<section>
+						<h2 style="text-transform: none;">The Option type</h2>
+						<ul>
+							<li>How offen we see <span class="monospace">NullPointerException</span>?</li>
+							<li class="fragment">Why?</li>
+							<li class="fragment">For instance, Groovy has the null-safe operator <span class="monospace">foo?.bar?.baz</span></li>
+							<li class="fragment">Nothing forces you to use it</li>
+							<li class="fragment">Scala tries to solve the problem by getting rid of <span class="monospace">null</span> values altogether</li>
+						</ul>
+					</section>
+					<section>
+						<h2 style="text-transform: none;">Option[A]</h2>
+						<ul>
+							<li>Container for an optional value of type <span class="monospace">A</span>, <br/>i.e. values that may be present or not</li>
+							<li class="fragment">If the value of type <span class="monospace">A</span> is present, the <span class="monospace">Option[A]</span> is an instance of <span class="monospace yellow">Some[A]</span></li>
+							<li class="fragment">If the value is absent, the <span class="monospace">Option[A]</span> is the object <span class="monospace yellow">None</span></li>
+						</ul>
+					</section>
+					<section>
+						<h2 style="text-transform: none;">Option[A]</h2>
+						<ul>
+							<li>By stating that a value may or may not be present <span style="font-style: italic;">on the type level</span>, you and any other developers who work with your code are forced by the compiler to deal with this possibility</li>
+							<li class="fragment">There is no way you may accidentally rely on the presence of a value that is really optional</li>
+						</ul>
+					</section>
+					<section>
+						<h2 style="text-transform: none;">Creating an option</h2>
+						<ul><li>Usually, you can simply create an <span class="monospace">Option[A]</span> for a present value by directly instantiating the <span class="monospace">Some</span> case class:</li></ul>
+						<pre><code data-trim contenteditable>
+  val greeting: Option[String] = Some("Hello world")
+  						</code></pre>
+						<div class="fragment"><ul><li>Or, if you know that the value is absent, you simply assign or return the <span class="monospace">None</span> object:</li></ul>
+  						<pre><code data-trim contenteditable>
+  val greeting: Option[String] = None
+  						</code></pre></div>
+					</section>
+					<section>
+						<h2 style="text-transform: none;">Working with optional values</h2>
+						<pre><code data-trim contenteditable>
+case class User(
+  id: Int,
+  firstName: String,
+  lastName: String,
+  age: Int,
+  gender: Option[String])
+
+object UserRepository {
+  private val users = Map(
+  1 -> User(1, "John", "Doe", 32, Some("male")),
+  2 -> User(2, "Johanna", "Doe", 30, None))
+
+  def findById(id: Int): Option[User] = users.get(id)
+  def findAll = users.values
+}
+  						</code></pre>
+					</section>
+					<section>
+						<h2 style="text-transform: none;">Working with optional values</h2>
+						<ol><li>One way would be to check if a value is present by means of the <span class="monospace">isDefined</span> method of your option, and, if that is the case, get that value via its <span class="monospace">get</span> method:
+						<pre><code data-trim contenteditable>  val user1 = UserRepository.findById(1)
+  if(user1.isDefined) {
+    println(user1.get.firstName)
+  } // will print "John"</code></pre></li>
+  <li class="fragment">Very often, you want to work with a fallback or default value in case an optional value is absent. This use case is covered pretty well by the <span class="monospace">getOrElse</span> method defined on <span class="monospace">Option</span>:
+  <pre><code data-trim contenteditable>  val user = User(2, "Johanna", "Doe", 30, None)
+  println("Gender: " + user.gender.getOrElse("not specified"))
+  // will print "Gender: not specified"</code></pre></li>
+  <li class="fragment">Or use <span class="yellow">Pattern Matching</span></li></ol>
+					</section>
+					
+				</section>
+
+
+				<section>
+					<section>
+						<h1>Pattern matching</h1>
+					</section>
+					<section>
+						<h2>Pattern matching</h2>
+<div style="display: inline-block; position: absolute; left: 150px; width: 300px;">switch statement
+<pre><code data-trim contenteditable>
+switch (whatIsThis) {
+  case 8:
+  case 10:
+    doSomething();
+    break;
+  case 12:
+    doSomethingElse();
+    break;
+  default:
+    doDefault();
+}
+
+</code></pre></div>
+<div style="display: inline-block; position: absolute; width: 360px;">match expression
+<pre><code data-trim contenteditable>
+whatIsThis match {
+  case 8 | 10 => something
+  case 12 => somethingElse
+  case _ => defaultValue
+}
+
+</code></pre></div>
+					</section>
+					<section>
+						<h2>Wildcard pattern</h2>
+<pre><code data-trim contenteditable>
+  whatIsThis match {
+    case _ => "anything!" 
+  }
+
+</code></pre>
+					</section>
+					<section>
+						<h2>Constant pattern</h2>
+<pre><code data-trim contenteditable>
+  whatIsThis match {
+    case 42 => "a magic no." 
+    case "hello!" => "a greeting"
+    case math.Pi => "another magic no."
+    case _ => "something else"
+  }
+
+</code></pre>
+					</section>
+					<section>
+						<h2>Variable pattern</h2>
+<pre><code data-trim contenteditable>
+  whatIsThis match {
+    case 0 => "zero"
+    case somethingElse => "not zero: " + somethingElse
+  }
+
+</code></pre>
+					</section>
+					<section>
+						<h2>Typed pattern</h2>
+<pre><code data-trim contenteditable>
+  whatIsThis match {
+    case n: Int => "aah, a number!?" 
+    case c: Character => "it's" + c.name
+  }
+
+</code></pre>
+					</section>
+					<section>
+						<h2>Constructor pattern</h2>
+<pre><code data-trim contenteditable>
+  sealed abstract class Shape
+  case class Circle( radius : Double ) extends Shape
+  case class Rectangle( width : Double, height : Double ) extends Shape
+  case class Triangle( base : Double, height : Double ) extends Shape
+
+</code></pre>
+<pre><code data-trim contenteditable>
+  whatIsThis match {
+    case Circle( radius ) => Pi * ( pow( radius, 2.0 ) )
+    case Rectangle( 1, height ) => height
+    case Rectangle( width, 1 ) => width
+    case Rectangle( width, height ) => width * height
+    case Triangle( 0, _ ) | Triangle( _, 0 ) => 0
+    case Triangle( base, height ) => height * base / 2
+  }
+
+</code></pre>
+					</section>
+					<section>
+					<h2>Tuple patterns</h2>
+<pre><code data-trim contenteditable>
+  whatIsThis match {
+    case (a, b) => "Tuple2"
+    case (42, math.Pi, _) => "magic numbers + anything"
+    case (s: String, _, _) => "matched string on first position " + s
+    case (a, b, c) => "matched " + a + b + c
+    case _ => "no match"
+  }
+
+</code></pre>
+					</section>	
+					<section>
+					<h2>Pattern Matching on Option type</h2>
+<pre><code data-trim contenteditable>
+  val user = User(2, "Johanna", "Doe", 30, None)
+  val gender = user.gender match {
+    case Some(gender) => gender
+    case None => "not specified"
+  }
+  println("Gender:" + gender)
+
+</code></pre>
+					</section>
+
+				</section>
+				<section>
+					<section>	
+						<h1>Functional Programming</h1>
+					</section>
+					<section>	
+						<h2>FP - Motivation</h2>
+						<pre><code data-trim contenteditable>
+  public long vypoctiDotaci(Zadost zadost, List&lt;ZadostOblast&gt; oblasti) {
+  
+    long celkovaDotace = 0;
+  
+    for (ZadostOblast oblast : oblasti) {
+      long naklady = oblast.getNakladySkutecne();
+      long oblastDotace = naklady * getKoeficient(zadost);
+  
+      oblast.setDotace(oblastDotace);
+      celkovaDotace += oblastDotace;
+    }
+  
+    return celkovaDotace;
+  }
+
+</code></pre>					</section>
+					<section>
+						<h2>What is FP</h2>
+						<ul>
+							<li class="fragment">Assigment less programming</li>
+							<li class="fragment">Function don't have side effect</li>
+							<li style="list-style-type: none">
+								<ul class="side-effects"><li class="fragment">Modifying a variable</li>
+								<li class="fragment">Modifying a data structure in place</li>
+								<li class="fragment">Setting a field on an object</li>
+								<li class="fragment">Throwing an exception</li>
+								<li class="fragment">Printing to the console or reading user input</li>
+								<li class="fragment">Reading from or writing to a file</li></ul>
+							</li>
+							<li class="fragment">Function are first class citizen</li>
+							<li class="fragment">Functions are higher order</li>
+						</ul>
+					</section>
+					<section>
+						<h2>Function Literal</h2>
+						<pre><code data-trim contenteditable>
+  ( x: Int, y: Int ) => x + y
+
+  <span class="fragment">( a: Int, b: Int, c: Int ) => {
+     val aSquare = a * a
+     val bSquare = b * b
+     val cSquare = c * c
+     
+     aSquare + bSquare == cSquare
+  }</span>
+
+</code></pre>
+					</section>
+					<section>
+						<h2>Function Value</h2>
+						<pre><code data-trim contenteditable>
+  val <span class="yellow">add</span> = ( x: Int, y: Int ) => x + y
+
+  <span class="fragment">val <span class="yellow">isPythagoras</span> = ( a: Int, b: Int, c: Int ) => {
+     val aSquare = a * a
+     val bSquare = b * b
+     val cSquare = c * c
+     
+     aSquare + bSquare == cSquare
+  }</span>
+
+</code></pre>
+					</section>
+					<section>
+						<h2>Function Type</h2>
+						<pre><code data-trim contenteditable>
+  val add: <span class="yellow">(Int, Int) => Int</span> = ( x: Int, y: Int ) => x + y
+
+  <span class="fragment">val isPythagoras: <span class="yellow">(Int, Int, Int) => Boolean</span> = 
+  ( a: Int, b: Int, c: Int ) => {
+     val aSquare = a * a
+     val bSquare = b * b
+     val cSquare = c * c
+     
+     aSquare + bSquare == cSquare
+  }</span>
+
+</code></pre>
+					</section>
+					<section>
+						<h2>Function Application</h2>
+						<pre><code data-trim contenteditable>
+  add(3,	8) // 11
+
+  isPythagoras(1,2,3) // false
+
+  isPythagoras(3,4,5) // true
+
+</code></pre>
+					</section>
+					<section>
+						<h2>Traversing - Java</h2>
+						<pre><code data-trim contenteditable>
+public List&lt;User&gt; findUserByFirstName(List&lt;User&gt; users, String firstName) {
+  List&lt;User&gt; foundUsers = new ArrayList&lt;User&gt;();
+  for(User user: users) {
+    if(user.<span class="blue">getFirstName()</span>.contains(firstName)) {
+      foundUsers.add(user);
+    }
+  }
+  return foundUsers;
+}
+
+public List&lt;User&gt; findUserByLastName(List&lt;User&gt; users, String lastName) {
+  List&lt;User&gt; foundUsers = new ArrayList&lt;User&gt;();
+  for(User user: users) {
+    if(user.<span class="blue">getLastName()</span>.contains(lastName)) {
+      foundUsers.add(user);
+    }
+  }
+  return foundUsers;
+}
+
+</code></pre>
+					</section>
+					<section>
+						<h2>Traversing - Scala</h2>
+						<pre><code data-trim contenteditable>
+  users.filter((user: User) => user.firstName.contains("o"))
+  users.filter((user: User) => user.lastName.contains("Mar"))
+<span class="fragment">
+  users.filter(user => user.firstName.contains("o"))
+  users.filter(user => user.lastName.contains("Mar"))
+</span><span class="fragment">
+  users.filter(_.firstName.contains("o"))
+  users.filter(_.lastName.contains("Mar"))
+</span>
+</code></pre>
+					</section>
+					<section>
+						<h3>Currying - two argument functions</h3>
+						<pre><code data-trim contenteditable>
+  def addA(x: Int, y: Int): Int =
+    x + y
+
+  def addB(x: Int): Int => Int =
+    y => x + y
+
+  val a = addA(10, 20)
+
+  val b = addB(10)(20)
+
+</code></pre>
+					</section>
+					<section>
+					<h3>Currying - three argument functions</h3>
+						<pre><code data-trim contenteditable>
+  def addA(x: Int, y: Int, z: Int): Int =
+    x + y + z
+
+  def addB(x: Int): Int => (Int => Int) =
+    y => (z => x + y + z)
+
+  val a = addA(1, 2, 3)
+
+  val b = addB(1)(2)(3)
+
+</code></pre>
+					</section>
+					<section>
+						<h2>Function are modular</h2>
+						<p class="left">A pure function of type <code><span class="red">(</span><span class="blue">A => B</span><span class="red">)</span></code> is safe to use wherever an <code class="blue">A</code> is given and a <code class="blue">B</code> is expected.</p>
+						<p class="left">It can be tested by simply giving it an <code class="blue">A</code> and inspecting the <code class="blue">B</code>.</p>
+						<p class="left">It's always safe to call from multiple threads and order never matters.</p>
+					</section>
+					<section>
+						<h2>Function are compositional</h2>
+						<code>
+						<p class="left" style="margin-top: 50px;">f : <span class="red">(</span><span class="blue">A => B</span><span class="red">)</span></p>
+						<p class="left">g : <span class="red">(</span><span class="blue">B => C</span><span class="red">)</span></p>
+
+						<p class="left" style="margin-top: 50px;">g compose f : <span class="red">(</span><span class="blue">A => C</span><span class="red">)</span></p>
+						</code>
+					</section>
+					<section>
+						<h2>Strategy Pattern</h2>
+						<pre><code data-trim contenteditable>
+object DeathToStrategy extends App {
+
+  def add(a: Int, b: Int) = a + b
+  def subtract(a: Int, b: Int) = a - b
+  def multiply(a: Int, b: Int) = a * b
+  
+  def execute(callback:(Int, Int) => Int, x: Int, y: Int) = callback(x, y)
+
+  println("Add:      " + execute(add, 3, 4))
+  println("Subtract: " + execute(subtract, 3, 4))
+  println("Multiply: " + execute(multiply, 3, 4))
+
+}
+						</code></pre>
+					</section>
+				</section>
+				<section>
+					<h1>THE END</h1>
+					<h3>We didn't cover those topics:</h3>
+					<ul>
+						<li>Traits - multiple inheritance done right</li>
+						<li>Collection API</li>
+						<li>Implicit Conversions and Parameters</li>
+						<li>Control Abstraction</li>
+						<li>Structural Typing</li>
+						<li>For Comprehension</li>
+						<li>Promises a Futures</li>
+						<li>Covariant/Contravariant/Nonvariant type parameters</li>
+						<li>and much more...</li>
+					</ul>
+				</section>
+				<section>
+					<h2>Sources</h2>
+					<ul>
+						<li><a href="http://hacking-scala.org/post/49090249019/introductory-scala-presentation">Introductory Scala Presentation</a></li>
+						<li><a href="http://www.youtube.com/watch?v=LH75sJAR0hc">Why Scala? ...by a hilarious Indian guy</a></li>
+						<li><a href="http://www.youtube.com/watch?v=-uQ4M-KqevU">Scala Essentials - Pattern Matching and Case Classes</a></li>
+						<li><a href="http://danielwestheide.com/blog/2012/12/19/the-neophytes-guide-to-scala-part-5-the-option-type.html">The Neophyte's Guide to Scala Part 5: The Option Type</a></li>
+						<li><a href="https://thenewcircle.com/s/post/1584/functional_programming_is_terrible_runar_bjarnason_video">NE Scala 2014 - Functional Programming is Terrible</a></li>
+						<li><a href="http://alvinalexander.com/scala/how-scala-killed-oop-strategy-design-pattern">How Scala killed the Strategy Pattern</a></li>
+					</ul>
+				</section>
+
+			</div>
+
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.min.js"></script>
+
+		<script>
+
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+				transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+				// Parallax scrolling
+				// parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+				// parallaxBackgroundSize: '2100px 900px',
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.pack.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } },
+					// Remote control your reveal.js presentation using a touch device
+			        //{ src: 'plugin/remotes/remotes.js', async: true, condition: function() { return !!document.body.classList; } }
+
+				]
+			});
+		</script>
+	</body>
+</html>

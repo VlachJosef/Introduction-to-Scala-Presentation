@@ -1,0 +1,50 @@
+@charset "UTF-8";
+
+/*!
+ * reveal.js
+ * http://lab.hakim.se/reveal-js
+ * MIT licensed
+ *
+ * Copyright (C) 2013 Hakim El Hattab, http://hakim.se
+ */
+
+
+/*********************************************
+ * RESET STYLES
+ *********************************************/
+code {
+	font-weight: bold !important;
+}
+
+
+.red {
+	color: rgb(255, 100, 100);
+}
+
+.blue {
+	/*color: rgb(180, 180, 255);*/
+	color: rgb(0, 0, 222);
+}
+
+.yellow {
+	color: rgb(255, 100, 100);
+	/*color: rgb(245, 240, 63);*/
+}
+
+.reveal pre code {
+	max-height: 500px;
+}
+
+.reveal span.monospace {
+	font-family: monospace;
+	font-weight: bold !important;
+}
+
+.reveal ul.side-effects li {
+	font-size: 80%;  
+	font-style: italic;
+}
+
+.reveal .slides .left {
+	text-align: left;
+}
